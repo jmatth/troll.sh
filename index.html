@@ -2,6 +2,8 @@
 layout: default
 ---
 
+{% include redirect_browser.html %}
+
 range="{{ site.trolls | size }}"
 selection=$(( $RANDOM % range ))
 
